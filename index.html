@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tyler Dodge | Software Developer & AI Code Evaluator</title>
+<meta name="description" content="Tyler Dodge - Software Developer & AI Code Evaluator building CLI tooling, backend services, and open-source software in Python and TypeScript." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    /* Palette: Developer Terminal & Systems Engineering */
+    --bg-base:      #050505;
+    --bg-panel:     #0c0c0e;
+    --bg-card:      #121214;
+    --border-dim:   #222226;
+    --border-glow:  #3b82f6;
+    --text-main:    #ededed;
+    --text-muted:   #a1a1aa;
+    --accent-blue:  #3b82f6;   /* AI/Tech */
+    --accent-gold:  #fbbf24;   /* Systems/CLI */
+    --accent-green: #10b981;   /* Build/Pass */
+
+    --font-sans: 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    
+    --max-w: 1200px;
+    --pad-x: clamp(1.5rem, 5vw, 4rem);
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background-color: var(--bg-base);
+    color: var(--text-main);
+    font-family: var(--font-sans);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* Abstract Data Grid Background */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background-image: 
+      linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    background-size: 30px 30px;
+    mask-image: radial-gradient(circle at 50% 0%, black 10%, transparent 80%);
+    -webkit-mask-image: radial-gradient(circle at 50% 0%, black 10%, transparent 80%);
+  }
+
+  a { color: inherit; text-decoration: none; }
+  ::selection { background: rgba(59, 130, 246, 0.3); color: #fff; }
+
+  /* Navigation */
+  nav {
+    position: fixed;
+    top: 0; width: 100%;
+    z-index: 100;
+    background: rgba(5, 5, 5, 0.7);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-dim);
+  }
+
+  .nav-container {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 1rem var(--pad-x);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .logo {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .logo-blinker {
+    display: inline-block;
+    width: 10px; height: 10px;
+    background-color: var(--accent-blue);
+    animation: blink 1.5s infinite;
+  }
+
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+  .nav-links {
+    display: flex;
+    gap: 2rem;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  .nav-links a { transition: color 0.2s ease; }
+  .nav-links a:hover { color: var(--accent-blue); }
+
+  @media (max-width: 768px) { .nav-links { display: none; } }
+
+  /* Section Containers */
+  section {
+    padding: 6rem var(--pad-x);
+    max-width: var(--max-w);
+    margin: 0 auto;
+  }
+
+  .section-header {
+    margin-bottom: 3rem;
+    display: flex;
+    align-items: flex-end;
+    gap: 1rem;
+    border-bottom: 1px solid var(--border-dim);
+    padding-bottom: 1rem;
+  }
+
+  .section-id {
+    font-family: var(--font-mono);
+    color: var(--accent-blue);
+    font-size: 0.9rem;
+  }
+
+  .section-title {
+    font-size: 2rem;
+    font-weight: 600;
+    margin: 0;
+    line-height: 1;
+  }
+
+  /* Hero Section */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding-top: 8rem;
+    position: relative;
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 4rem;
+    align-items: center;
+    width: 100%;
+  }
+
+  @media (max-width: 900px) {
+    .hero-grid { grid-template-columns: 1fr; }
+  }
+
+  .sys-status {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--accent-green);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    padding: 0.4rem 0.8rem;
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    border-radius: 4px;
+    background: rgba(16, 185, 129, 0.06);
+  }
+
+  .hero h1 {
+    font-size: clamp(3rem, 6vw, 4.5rem);
+    font-weight: 600;
+    line-height: 1.1;
+    margin: 0 0 1rem;
+    letter-spacing: -0.03em;
+  }
+
+  .hero h1 span {
+    background: linear-gradient(90deg, var(--text-main), var(--text-muted));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .hero-role {
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    color: var(--accent-blue);
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-desc {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    max-width: 50ch;
+    margin-bottom: 2.5rem;
+  }
+
+  .btn-group {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    padding: 0.8rem 1.5rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .btn-primary {
+    background: var(--accent-blue);
+    color: #fff;
+    border: 1px solid var(--accent-blue);
+  }
+  .btn-primary:hover {
+    background: transparent;
+    color: var(--accent-blue);
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+  }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--text-main);
+    border: 1px solid var(--border-dim);
+  }
+  .btn-outline:hover {
+    border-color: var(--text-main);
+    background: rgba(255,255,255,0.05);
+  }
+
+  /* Terminal Window Art */
+  .terminal-window {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-dim);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+  }
+
+  .terminal-bar {
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border-dim);
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .terminal-dots {
+    display: flex;
+    gap: 6px;
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--border-dim);
+  }
+  .dot.r { background: #ef4444; opacity: 0.8; }
+  .dot.y { background: #fbbf24; opacity: 0.8; }
+  .dot.g { background: #10b981; opacity: 0.8; }
+
+  .terminal-title {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+  }
+
+  .terminal-body {
+    padding: 1.25rem;
+    color: #d4d4d8;
+    line-height: 1.7;
+  }
+
+  .cmd-line { color: var(--text-main); margin-bottom: 0.5rem; }
+  .cmd-prompt { color: var(--accent-green); margin-right: 0.5rem; }
+  .cmd-out { color: var(--text-muted); margin-bottom: 1rem; padding-left: 1rem; border-left: 2px solid var(--border-dim); }
+  .hl-blue { color: var(--accent-blue); }
+  .hl-gold { color: var(--accent-gold); }
+  .hl-green { color: var(--accent-green); }
+
+  /* Metrics Panel */
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+
+  .metric-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-dim);
+    padding: 1.5rem;
+    border-radius: 6px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
+    opacity: 0.5;
+  }
+
+  .metric-label {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  .metric-value {
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--text-main);
+  }
+
+  /* Open Source & Projects Grid */
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .project-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-dim);
+    padding: 1.75rem;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.25s ease;
+  }
+
+  .project-card:hover {
+    border-color: rgba(59, 130, 246, 0.45);
+    transform: translateY(-3px);
+  }
+
+  .project-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+  }
+
+  .project-badge {
+    color: var(--accent-green);
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+  }
+
+  .project-card h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.2rem;
+    font-family: var(--font-mono);
+    color: var(--text-main);
+  }
+
+  .project-card p {
+    color: #c4c4c4;
+    font-size: 0.94rem;
+    margin: 0 0 1.25rem 0;
+  }
+
+  .project-stack {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  .project-stack span {
+    background: var(--bg-base);
+    padding: 0.25rem 0.6rem;
+    border: 1px solid var(--border-dim);
+    border-radius: 4px;
+  }
+
+  /* Experience Cards (Terminal Log Style) */
+  .timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .log-entry {
+    background: var(--bg-card);
+    border: 1px solid var(--border-dim);
+    padding: 2rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .log-entry:hover {
+    border-color: rgba(59, 130, 246, 0.4);
+    transform: translateX(5px);
+  }
+
+  .log-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .log-title h3 {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.25rem;
+    font-weight: 500;
+  }
+
+  .log-company {
+    font-family: var(--font-mono);
+    color: var(--accent-gold);
+    font-size: 0.9rem;
+  }
+
+  .log-meta {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    background: var(--bg-base);
+    padding: 0.3rem 0.8rem;
+    border: 1px solid var(--border-dim);
+    border-radius: 4px;
+  }
+
+  .log-entry ul {
+    list-style: none;
+    padding: 0; margin: 0;
+  }
+
+  .log-entry li {
+    position: relative;
+    padding-left: 1.5rem;
+    margin-bottom: 0.8rem;
+    color: #c4c4c4;
+    font-size: 0.95rem;
+  }
+
+  .log-entry li::before {
+    content: '>';
+    position: absolute;
+    left: 0;
+    color: var(--accent-blue);
+    font-family: var(--font-mono);
+  }
+
+  /* Skills & Modules */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+  }
+
+  @media (max-width: 768px) {
+    .grid-2 { grid-template-columns: 1fr; gap: 2rem; }
+  }
+
+  .tag-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+  }
+
+  .tag {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-dim);
+    border-radius: 4px;
+    background: var(--bg-card);
+    transition: all 0.2s ease;
+  }
+
+  .tag:hover {
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+  }
+
+  .edu-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .edu-item {
+    border-left: 2px solid var(--border-dim);
+    padding-left: 1rem;
+  }
+  
+  .edu-item h4 {
+    margin: 0 0 0.25rem 0;
+    font-weight: 500;
+  }
+
+  .edu-item p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+
+  /* Footer */
+  footer {
+    border-top: 1px solid var(--border-dim);
+    padding: 2rem var(--pad-x);
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-container">
+    <a href="#" class="logo">
+      <span class="logo-blinker"></span>
+      T.DODGE_
+    </a>
+    <div class="nav-links">
+      <a href="#about">01. PROFILE</a>
+      <a href="#projects">02. REPOSITORIES</a>
+      <a href="#experience">03. EXECUTION</a>
+      <a href="#architecture">04. STACK</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-grid">
+    <div>
+      <div class="sys-status">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="var(--accent-green)"><circle cx="12" cy="12" r="10"></circle></svg>
+        ENV READY // LINUX &amp; WSL2 WORKFLOW
+      </div>
+      <h1><span>Tyler</span><br>Dodge.</h1>
+      <div class="hero-role">&gt; Software Developer &amp; AI Code Evaluator</div>
+      <p class="hero-desc">Building reliable CLI developer tools, backend services, and open-source software in Python and TypeScript—while evaluating and benchmarking AI coding assistants on real-world software engineering workflows.</p>
+      
+      <div class="btn-group">
+        <a href="mailto:tylerdodgedev84@gmail.com" class="btn btn-primary">Initialize Contact</a>
+        <a href="https://github.com/tylerdodgedev84-collab" target="_blank" rel="noopener" class="btn btn-outline">View GitHub</a>
+        <a href="https://www.linkedin.com/in/tylerdevdodge84/" target="_blank" rel="noopener" class="btn btn-outline">LinkedIn Profile</a>
+      </div>
+    </div>
+    
+    <!-- Developer Terminal Card -->
+    <div class="terminal-window">
+      <div class="terminal-bar">
+        <div class="terminal-dots">
+          <span class="dot r"></span>
+          <span class="dot y"></span>
+          <span class="dot g"></span>
+        </div>
+        <div class="terminal-title">tyler@wsl2-ubuntu: ~/repos/git-pulse-cli</div>
+      </div>
+      <div class="terminal-body">
+        <div class="cmd-line"><span class="cmd-prompt">$</span>git status --short &amp;&amp; pytest -q</div>
+        <div class="cmd-out">
+          <span class="hl-green">42 passed</span> in 0.84s<br/>
+          branch: <span class="hl-blue">main</span> (clean working tree)
+        </div>
+        <div class="cmd-line"><span class="cmd-prompt">$</span>git-pulse status --summary</div>
+        <div class="cmd-out">
+          lang: <span class="hl-gold">Python, TypeScript, Node.js, SQL</span><br/>
+          env: <span class="hl-blue">Linux / Windows (WSL2) / Git CLI</span><br/>
+          focus: <span class="hl-green">Open-Source Tooling &amp; AI Code Evaluation</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="section-header">
+    <span class="section-id">01</span>
+    <h2 class="section-title">System Metrics</h2>
+  </div>
+  
+  <p style="font-size: 1.1rem; color: #d4d4d8; max-width: 800px; margin-bottom: 3rem;">
+    Software developer with six years of experience building web applications, CLI tooling, and backend services in Python and TypeScript. Alongside maintaining personally owned open-source projects in Git across Linux and Windows (WSL2) terminal workflows, I work with AI coding assistants to ship features, refactor modules, and write structured side-by-side evaluations of model code quality and reasoning.
+  </p>
+
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="metric-label">Engineering Experience</div>
+      <div class="metric-value">6+ Years</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">AI Code Evaluations</div>
+      <div class="metric-value">400+ <span style="font-size: 0.8rem; color: var(--text-muted);">(Side-by-Side)</span></div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Regression Reduction</div>
+      <div class="metric-value">-20%</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Core Environment</div>
+      <div class="metric-value">Linux / WSL2</div>
+    </div>
+  </div>
+</section>
+
+<section id="projects">
+  <div class="section-header">
+    <span class="section-id">02</span>
+    <h2 class="section-title">Personally Owned Open-Source Projects</h2>
+  </div>
+
+  <div class="projects-grid">
+    <a href="https://github.com/tylerdodgedev84-collab/git-pulse-cli" target="_blank" rel="noopener" class="project-card">
+      <div>
+        <div class="project-top">
+          <span style="color: var(--accent-blue);">SOLE MAINTAINER // GIT REPO</span>
+          <span class="project-badge">MIT LICENSE</span>
+        </div>
+        <h3>git-pulse-cli &rarr;</h3>
+        <p>Lightweight Python command-line utility for inspecting Git repository health, branch divergence, stale worktrees, and local test runner hooks directly from the terminal.</p>
+      </div>
+      <div class="project-stack">
+        <span>Python</span>
+        <span>CLI</span>
+        <span>Git Workflows</span>
+        <span>Pytest</span>
+      </div>
+    </a>
+
+    <div class="project-card">
+      <div>
+        <div class="project-top">
+          <span style="color: var(--accent-blue);">SOLE MAINTAINER</span>
+          <span class="project-badge">MIT LICENSE</span>
+        </div>
+        <h3>devflow-check</h3>
+        <p>Fast TypeScript &amp; Node.js pre-flight validator that lints environment schemas, checks local Docker/WSL2 port bindings, and validates REST API response contracts.</p>
+      </div>
+      <div class="project-stack">
+        <span>TypeScript</span>
+        <span>Node.js</span>
+        <span>CLI Tooling</span>
+        <span>Vitest</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="experience">
+  <div class="section-header">
+    <span class="section-id">03</span>
+    <h2 class="section-title">Execution Log</h2>
+  </div>
+
+  <div class="timeline">
+    
+    <div class="log-entry">
+      <div class="log-header">
+        <div class="log-title">
+          <h3>AI Coding Evaluator &amp; Software Developer</h3>
+          <div class="log-company">@ SuperAnnotate</div>
+        </div>
+        <div class="log-meta">2024 - Present | Remote</div>
+      </div>
+      <ul>
+        <li>Use AI coding assistants in live development sessions to build features, fix bugs, refactor code, and write docs across Python and TypeScript projects.</li>
+        <li>Compare paired AI assistant responses at each step, choosing the stronger solution and writing clear explanations of reasoning, edge cases, and code quality.</li>
+        <li>Maintain and ship updates to a personally owned, MIT-licensed open-source CLI tool hosted in Git using Linux and Windows (WSL2) terminal workflows.</li>
+        <li>Evaluated over 400 side-by-side coding responses in the first six months, catching logic bugs, broken API assumptions, and unnecessary complexity.</li>
+      </ul>
+    </div>
+
+    <div class="log-entry">
+      <div class="log-header">
+        <div class="log-title">
+          <h3>Software Developer</h3>
+          <div class="log-company">@ Kinaxis</div>
+        </div>
+        <div class="log-meta">2022 - 2024 | Ottawa, ON</div>
+      </div>
+      <ul>
+        <li>Developed and maintained backend services and internal CLI developer tools in Python and TypeScript supporting core data processing pipelines.</li>
+        <li>Refactored legacy modules and expanded automated unit and integration test suites, reducing recurring release regressions by 20%.</li>
+        <li>Built Git-based CI checks and terminal workflow utilities in Linux environments to speed up local builds and pull request validation.</li>
+        <li>Wrote technical documentation, code review notes, and contributor guides across internal engineering repositories.</li>
+      </ul>
+    </div>
+
+    <div class="log-entry">
+      <div class="log-header">
+        <div class="log-title">
+          <h3>Full-Stack Software Developer</h3>
+          <div class="log-company">@ Fullscript</div>
+        </div>
+        <div class="log-meta">2020 - 2022 | Ottawa, ON</div>
+      </div>
+      <ul>
+        <li>Built and maintained REST APIs, background workers, and web features using TypeScript, Node.js, Python, and PostgreSQL.</li>
+        <li>Diagnosed and resolved production bugs, query bottlenecks, and edge-case failures across third-party API integrations.</li>
+        <li>Worked daily in Git branching workflows, terminal test runners, and peer code reviews to ship reliable weekly releases.</li>
+      </ul>
+    </div>
+
+    <div class="log-entry">
+      <div class="log-header">
+        <div class="log-title">
+          <h3>Junior Software Developer</h3>
+          <div class="log-company">@ Ross Video</div>
+        </div>
+        <div class="log-meta">2018 - 2020 | Ottawa, ON</div>
+      </div>
+      <ul>
+        <li>Built Python automation scripts, command-line diagnostic tools, and test suites used by software and QA engineering teams.</li>
+        <li>Supported ongoing bug fixes, module refactoring, and technical documentation across Linux-based development environments.</li>
+      </ul>
+    </div>
+
+  </div>
+</section>
+
+<section id="architecture">
+  <div class="section-header">
+    <span class="section-id">04</span>
+    <h2 class="section-title">Architecture &amp; Credentials</h2>
+  </div>
+
+  <div class="grid-2">
+    <div>
+      <h3 style="font-family: var(--font-mono); font-size: 1rem; color: var(--accent-blue); margin-bottom: 1.5rem;">&gt; LOAD_MODULES: Top Skills</h3>
+      <div class="tag-cloud">
+        <div class="tag">Python &amp; TypeScript</div>
+        <div class="tag">Git &amp; Terminal Workflows</div>
+        <div class="tag">Linux &amp; Windows (WSL2)</div>
+        <div class="tag">Open-Source Maintenance</div>
+        <div class="tag">CLI &amp; Developer Tooling</div>
+        <div class="tag">REST APIs &amp; Backend Systems</div>
+        <div class="tag">AI-Assisted Development</div>
+        <div class="tag">Code Review &amp; Evaluation</div>
+      </div>
+    </div>
+
+    <div>
+      <h3 style="font-family: var(--font-mono); font-size: 1rem; color: var(--accent-gold); margin-bottom: 1.5rem;">&gt; SYSTEM_REQUIREMENTS: Education &amp; Certs</h3>
+      <div class="edu-list">
+        <div class="edu-item">
+          <h4>Bachelor's Degree in Computer Science</h4>
+          <p>Completed 2014 - 2018</p>
+        </div>
+        <div class="edu-item">
+          <h4>AWS Certified Developer - Associate</h4>
+          <p>Amazon Web Services</p>
+        </div>
+        <div class="edu-item">
+          <h4>Linux Foundation Certified IT Associate (LFCA)</h4>
+          <p>The Linux Foundation</p>
+        </div>
+        <div class="edu-item">
+          <h4>GitHub Actions &amp; Git Workflows Certificate</h4>
+          <p>GitHub Training</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>TYLER DODGE // OTTAWA, ON // (613) 858-4540</p>
+  <p style="margin-top: 0.5rem;">
+    <a href="mailto:tylerdodgedev84@gmail.com" style="color: var(--accent-blue);">tylerdodgedev84@gmail.com</a>
+    &nbsp;&middot;&nbsp;
+    <a href="https://github.com/tylerdodgedev84-collab" target="_blank" rel="noopener" style="color: var(--accent-blue);">github.com/tylerdodgedev84-collab</a>
+    &nbsp;&middot;&nbsp;
+    <a href="https://www.linkedin.com/in/tylerdevdodge84/" target="_blank" rel="noopener" style="color: var(--accent-blue);">linkedin.com/in/tylerdevdodge84</a>
+  </p>
+</footer>
+
+</body>
+</html>
